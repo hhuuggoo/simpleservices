@@ -1,8 +1,10 @@
 import logging
+import signal
 import atexit
 import subprocess
 import os
 import json
+import sys
 
 logger = logging.getLogger(__name__)
 registry = {}
@@ -28,7 +30,7 @@ class ManagedProcess(object):
                 pass
         elif pid and not kill_old:
             raise Exception("process %s is running on PID %s" % (name, pid))
-
+        self.closed = True
         try:
             self.proc = subprocess.Popen(args, stdout=stdout, stderr=stderr, stdin=stdin)
         except OSError as error:
@@ -40,6 +42,7 @@ class ManagedProcess(object):
     def read_pidfile(self):
         if not os.path.exists(self.pidfilename):
             data = {}
+            return data
         with open(self.pidfilename, "r") as f:
             try:
                 data = json.load(f)
@@ -64,10 +67,15 @@ class ManagedProcess(object):
 
     def close(self):
         if not self.closed:
-            self.proc.kill()
+            self.proc.send_signal(signal.SIGTERM)
+            #self.proc.kill()
             self.proc.communicate()
             self.remove_from_pidfile()
             self.closed = True
+
+def close(pidfile, name):
+    proc = registry.pop((pidfile, name))
+    proc.close()
 
 def close_all():
     for k,v in registry.iteritems():
@@ -75,6 +83,12 @@ def close_all():
             v.close()
         except Exception as e:
             logger.exception(e)
+    registry.clear()
+
+def exit(*args, **kwargs):
+    close_all()
+    os._exit(0)
 
 def register_shutdown():
-    atexit.register(close_all)
+    #does this work in windows?
+    signal.signal(signal.SIGTERM, exit)

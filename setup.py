@@ -3,15 +3,10 @@ if sys.argv[1] == 'develop':
     from setuptools import setup
 else:
     from distutils.core import setup
-
-try:
-    from wk_publisher import __version__ as version
-except ImportError:
-    version = '???'
-
+__version__ = (0,2)
 setup(
     name='simpleservices',
-    version=version,
+    version='.'.join([str(x) for x in __version__]),
     author='Hugo Shi',
     description='utility for running simple services',
     packages=['simpleservices'],

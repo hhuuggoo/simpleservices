@@ -1,0 +1,17 @@
+package:
+  name: simpleservices
+  version: 0.2
+
+source:
+  git_url: git@github.com:hhuuggoo/kitchensink.git
+
+requirements:
+  build:
+    - python
+
+  run:
+    - python
+
+about:
+  home: https://github.com/ContinuumIO/ArrayManagement
+  license: BSD
