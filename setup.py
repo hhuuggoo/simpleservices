@@ -8,8 +8,10 @@ setup(
     name='simpleservices',
     version='.'.join([str(x) for x in __version__]),
     author='Hugo Shi',
+    author_email='hugo.r.shi@gmail.com',
     description='utility for running simple services',
     packages=['simpleservices'],
     include_package_data=True,
+    url='http://github.com/hhuuggoo/simpleservices',
     package_data={'simpleservices':['*.conf']}
 )
